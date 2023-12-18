@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:untitled3/answerr.dart';
+import 'appbrine.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() => runApp(Quizzler());
 
@@ -7,9 +10,9 @@ class Quizzler extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-      appBar: AppBar(
-        title: Text('Quize'),
-      ),
+        appBar: AppBar(
+          title: Text('Quiz App'),
+        ),
         backgroundColor: Colors.cyan,
         body: SafeArea(
           child: Padding(
@@ -25,25 +28,50 @@ class Quizzler extends StatelessWidget {
 class QuizPage extends StatefulWidget {
   @override
   _QuizPageState createState() => _QuizPageState();
-}class _QuizPageState extends State<QuizPage> {
-  List<Icon> scorekeeper=[
+}
 
-      Icon(Icons.check,
-        color: Colors.green,
+class _QuizPageState extends State<QuizPage> {
+  List<Widget> scoreKeeper = [];
+  QuizApp quizApp = QuizApp();
 
-      ),
-      Icon(Icons.close,
-        color: Colors.red,
-      ),
+  void checkAnswer(bool userAnswer) {
+    bool correctAnswer = quizApp.getCurrentQuestionAnswer();
+    setState(() {
+      if (userAnswer == correctAnswer) {
+        scoreKeeper.add(
+          Icon(Icons.check, color: Colors.green),
+        );
+      } else {
+        scoreKeeper.add(
+          Icon(Icons.clear, color: Colors.red),
+        );
+      }
+      if(quizApp.iffinish==true){
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Finish",
+          desc: "The questions are over",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "AGAIN",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              width: 120,
+            )
+          ],
+        ).show();
+        quizApp.reset();
+       scoreKeeper =[];
+      }else {
+        quizApp.nextQuestion();
+      }
+    });
 
-      Icon(Icons.close,
-        color: Colors.red,
-      ),
+  }
 
-      Icon(Icons.close,
-        color: Colors.red,
-      ),
-    ];
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -56,7 +84,7 @@ class QuizPage extends StatefulWidget {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                quizApp.getCurrentQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -71,27 +99,18 @@ class QuizPage extends StatefulWidget {
             padding: EdgeInsets.all(15.0),
             child: TextButton(
               style: TextButton.styleFrom(
-                backgroundColor: Colors.white, // Set button background color
+                backgroundColor: Colors.white,
               ),
               child: Text(
                 'True',
                 style: TextStyle(
-                  color: Colors.black, // Set text color
+                  color: Colors.black,
                   fontSize: 20.0,
                 ),
               ),
-              onPressed: (
-
-                  ) {
-                setState(() {
-                  scorekeeper.add(
-                    Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                  );
-                });
-              }
+              onPressed: () {
+                checkAnswer(true);
+              },
             ),
           ),
         ),
@@ -100,35 +119,26 @@ class QuizPage extends StatefulWidget {
             padding: EdgeInsets.all(15.0),
             child: TextButton(
               style: TextButton.styleFrom(
-                backgroundColor: Colors.white, // Set button background color
+                backgroundColor: Colors.white,
               ),
               child: Text(
                 'False',
                 style: TextStyle(
                   fontSize: 20.0,
-                  color: Colors.black, // Set text color
+                  color: Colors.black,
                 ),
               ),
-              onPressed: (
-
-                  ) {
-                setState(() {
-                  scorekeeper.add(
-                    Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ),
-                  );
-                });
-                // The user picked false.
+              onPressed: () {
+                checkAnswer(false);
               },
             ),
           ),
         ),
         Row(
-          children:scorekeeper,
+          children: scoreKeeper,
         ),
       ],
     );
   }
 }
+
